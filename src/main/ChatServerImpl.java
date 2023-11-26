@@ -9,6 +9,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
+
     private List<ChatClient> clients;
 
     protected ChatServerImpl() throws RemoteException {
@@ -22,9 +23,14 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
     }
 
     @Override
-    public void broadcastMessage(String message) throws RemoteException {
+    public void broadcastMessage(ChatClient sender, String message) throws RemoteException {
         for (ChatClient client : clients) {
-            client.receiveMessage(message);
+            // Excluir al remitente del envío del mensaje
+            System.out.println("Cliente: " + client.toString());
+            System.out.println("Sender: " + sender);
+            if (!client.toString().equals(sender.toString())) {
+                client.receiveMessage(message);
+            }
         }
     }
 
@@ -41,7 +47,7 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
         try {
             // Direccion ip (localhost = InetAddress.getLocalHost().getHostAddress();)
             String ipAddress = "192.168.1.87";
-            
+
             // Establece la propiedad "java.rmi.server.hostname" para la dirección IP
             System.setProperty("java.rmi.server.hostname", ipAddress);
 

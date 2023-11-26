@@ -23,7 +23,7 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
     }
 
     public void sendMessage(String message) throws RemoteException {
-        chatServer.broadcastMessage(name + ": " + message);
+        chatServer.broadcastMessage(this, name + ": " + message);
     }
 
     public void sendPrivateMessage(String receiver, String message) throws RemoteException {
@@ -45,7 +45,6 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
             Scanner scanner = new Scanner(System.in);
             while (true) {
-                System.out.print("Enter message: ");
                 String message = scanner.nextLine();
 
                 if (message.startsWith("/private")) {
