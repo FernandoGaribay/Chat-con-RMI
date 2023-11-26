@@ -41,6 +41,19 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
         clients.remove(sender);
     }
 
+    @Override
+    public void sendPrivateMessage(ChatClient sender, String receiver, String message) throws RemoteException {
+        for (ChatClient client : clients) {
+            String clientName = client.getName();
+
+            if (clientName.equals(receiver)) {
+                client.receivePrivateMessage(sender.getName(), message);
+                return;
+            }
+        }
+        sender.receiveMessage("Usuario '" + receiver + "' no encontrado o no está en línea.");
+    }
+
     public static void main(String[] args) {
         try {
             // Direccion ip (localhost = InetAddress.getLocalHost().getHostAddress();)
