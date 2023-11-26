@@ -32,13 +32,13 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
     public static void main(String[] args) {
         try {
-            String name = "ChatServer"; // args[0]
+            String name = "Fernando"; // args[0]
 
             // Especifica la dirección IP del servidor
             String serverIP = "192.168.1.87";
 
             // Crea el registro RMI apuntando a la dirección IP y el puerto del servidor
-            Registry registry = LocateRegistry.getRegistry(serverIP, 1099);
+            Registry registry = LocateRegistry.getRegistry(serverIP, 1234);
             
             ChatServer chatServer = (ChatServer) registry.lookup("ChatServer");
             ChatClientImpl client = new ChatClientImpl(name, chatServer);
