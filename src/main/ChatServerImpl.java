@@ -26,8 +26,6 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
     public void broadcastMessage(ChatClient sender, String message) throws RemoteException {
         for (ChatClient client : clients) {
             // Excluir al remitente del envío del mensaje
-            System.out.println("Cliente: " + client.toString());
-            System.out.println("Sender: " + sender);
             if (!client.toString().equals(sender.toString())) {
                 client.receiveMessage(message);
             }
@@ -35,12 +33,13 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
     }
 
     @Override
-    public void sendPrivateMessage(String sender, String receiver, String message) throws RemoteException {
+    public void boardcastExitMessage(ChatClient sender, String message) throws RemoteException {
         for (ChatClient client : clients) {
-            if (client.toString().equals(receiver)) {
-                client.receiveMessage(sender + " (private): " + message);
+            if (!client.toString().equals(sender.toString())) {
+                client.receiveMessage(message);
             }
         }
+        clients.remove(sender);
     }
 
     public static void main(String[] args) {
