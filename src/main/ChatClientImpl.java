@@ -14,7 +14,7 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
         super();
         this.name = name;
         this.chatServer = chatServer;
-        chatServer.registerClient(this);
+        this.chatServer.registerClient(this);
     }
 
     @Override
@@ -51,6 +51,7 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
                 exitCode = message.equalsIgnoreCase("/exit");
             }
             client.exitChat();
+            System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();
         }
