@@ -41,7 +41,7 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
     }
 
     @Override
-    public void sendPrivateMessage(String receiver, String message) throws RemoteException {
+    public void sendPrivateMessage(String sender, String receiver, String message) throws RemoteException {
         ChatClient receiverInterface = chatServer.getReceiverInterface(this, receiver);
         String receiverIP = receiverInterface.getIP();
         
@@ -53,7 +53,7 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
                 //System.out.println("Estableciendo conexión directa con " + receiverIP + " y enviando mensaje...");
                 Socket serverSocket = new Socket(receiverIP, 9999);
                 DataOutputStream outputServer = new DataOutputStream(serverSocket.getOutputStream());
-                outputServer.writeUTF(receiverInterface.getName() + " te ha susurrado: " + message);
+                outputServer.writeUTF(sender + " te ha susurrado: " + message);
                 serverSocket.close();
 
             } catch (IOException ex) {
@@ -114,15 +114,11 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
     public static void main(String[] args) {
         try {
-            // Nombre del cliente
-            String name = "jos";
-            // IP del cliente
-            String clientIP = "192.168.1.89";  // Cambia esto con la forma en que obtienes la IP del cliente
-            // IP del servidor
+            String name = "fer";
+            String clientIP = "192.168.1.87";
             String serverIP = "192.168.1.87";
-            // Registro RMI con la dirección IP y el puerto del servidor
-            Registry registry = LocateRegistry.getRegistry(serverIP, BROADCAST_MESSAGE);
 
+            Registry registry = LocateRegistry.getRegistry(serverIP, BROADCAST_MESSAGE);
             ChatServer chatServer = (ChatServer) registry.lookup("ChatServer");
             ChatClientImpl client = new ChatClientImpl(name, clientIP, chatServer);
 
@@ -131,11 +127,11 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
             while (!exitCode) {
                 String message = scanner.nextLine();
 
-                if (message.startsWith("/private")) {
+                if (message.startsWith("/msg")) {
                     // Formato: /private [user] [message]
                     String[] parts = message.split(" ", 3);
                     if (parts.length == 3) {
-                        client.sendPrivateMessage(parts[1], parts[2]);
+                        client.sendPrivateMessage(name, parts[1], parts[2]);
                     } else {
                         System.out.println("Error de comando privado");
                     }
