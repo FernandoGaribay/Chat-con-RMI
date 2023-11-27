@@ -91,16 +91,13 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
                 BufferedReader input;
                 String message;
 
-                clientSocket = serverSocket.accept();
-                //Se obtiene el flujo de salida del cliente para enviarle mensajes
+                clientSocket = serverSocket.accept(); // Acepta  al cliente
                 outputClient = new DataOutputStream(clientSocket.getOutputStream());
-                //Se obtiene el flujo entrante desde el cliente
                 input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 while ((message = input.readLine()) != null) {
                     System.out.println(message);
                 }
                 clientSocket.close();
-
                 serverSocket.close();
             } catch (IOException ex) {
                 Logger.getLogger(ChatClientImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -112,7 +109,7 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
     public static void main(String[] args) {
         try {
-            String name = "asd";
+            String name = "ale";
             String clientIP = "192.168.1.89";
             String serverIP = "192.168.1.87";
 
@@ -120,7 +117,7 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
             ChatServer chatServer = (ChatServer) registry.lookup("ChatServer");
             ChatClientImpl client = new ChatClientImpl(name, clientIP, chatServer);
 
-            boolean exitCode = false;  // Inicializar como false
+            boolean exitCode = false;
             Scanner scanner = new Scanner(System.in);
             while (!exitCode) {
                 String message = scanner.nextLine();
