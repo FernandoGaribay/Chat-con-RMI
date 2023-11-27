@@ -8,4 +8,5 @@ public interface ChatClient extends Remote {
     void receivePrivateMessage(String sender, String message) throws RemoteException;
     void sendPrivateMessage(String receiver, String message) throws RemoteException;
     String getName() throws RemoteException; 
+    String getIP() throws RemoteException;
 }

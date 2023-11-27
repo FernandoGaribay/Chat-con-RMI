@@ -42,16 +42,15 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
     }
 
     @Override
-    public void sendPrivateMessage(ChatClient sender, String receiver, String message) throws RemoteException {
+    public String getReceiverIP(ChatClient sender, String receiver) throws RemoteException {
         for (ChatClient client : clients) {
             String clientName = client.getName();
 
             if (clientName.equals(receiver)) {
-                client.receivePrivateMessage(sender.getName(), message);
-                return;
+                return client.getIP();
             }
         }
-        sender.receiveMessage("Usuario '" + receiver + "' no encontrado o no está en línea.");
+        return null;
     }
 
     public static void main(String[] args) {

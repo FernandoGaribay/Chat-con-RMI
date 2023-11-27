@@ -8,11 +8,16 @@ import java.util.Scanner;
 public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implements ChatClient {
 
     private String name;
+    private String clientIP;
     private ChatServer chatServer;
+    
+    private static int BROADCAST_MESSAGE = 1234;
+    private static int PRIVATE_MESSAGE = 1234;
 
-    protected ChatClientImpl(String name, ChatServer chatServer) throws RemoteException {
+    protected ChatClientImpl(String name, String clientIP, ChatServer chatServer) throws RemoteException {
         super();
         this.name = name;
+        this.clientIP = clientIP;
         this.chatServer = chatServer;
         this.chatServer.registerClient(this);
     }
@@ -29,14 +34,27 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
     @Override
     public void sendPrivateMessage(String receiver, String message) throws RemoteException {
-        chatServer.sendPrivateMessage(this, receiver, message);
+        String receiverIP = chatServer.getReceiverIP(this, receiver);
+
+        if (receiverIP != null) {
+            // Aquí debes implementar la lógica para establecer una conexión directa
+            // con receiverIP y enviar el mensaje
+            System.out.println("Estableciendo conexión directa con " + receiverIP + " y enviando mensaje...");
+        } else {
+            System.out.println("Usuario '" + receiver + "' no encontrado o no está en línea.");
+        }
     }
 
     @Override
     public String getName() {
         return name;
     }
-    
+
+    @Override
+    public String getIP() throws RemoteException {
+        return clientIP;
+    }
+
     private void sendMessage(String message) throws RemoteException {
         chatServer.broadcastMessage(this, name + ": " + message);
     }
@@ -47,15 +65,17 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
     public static void main(String[] args) {
         try {
-            //Nombre del cliente
+            // Nombre del cliente
             String name = "alex";
+            // IP del cliente
+            String clientIP = "192.168.1.101";  // Cambia esto con la forma en que obtienes la IP del cliente
             // IP del servidor
             String serverIP = "192.168.1.87";
-            // Registro RMI con la direccion IP y el puerto del servidor
-            Registry registry = LocateRegistry.getRegistry(serverIP, 1234);
+            // Registro RMI con la dirección IP y el puerto del servidor
+            Registry registry = LocateRegistry.getRegistry(serverIP, BROADCAST_MESSAGE);
 
             ChatServer chatServer = (ChatServer) registry.lookup("ChatServer");
-            ChatClientImpl client = new ChatClientImpl(name, chatServer);
+            ChatClientImpl client = new ChatClientImpl(name, clientIP, chatServer);
 
             boolean exitCode = false;  // Inicializar como false
             Scanner scanner = new Scanner(System.in);
@@ -83,3 +103,4 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
         }
     }
 }
+
