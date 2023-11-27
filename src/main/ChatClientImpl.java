@@ -20,7 +20,7 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
     private ChatServer chatServer;
 
     private static int BROADCAST_MESSAGE = 1234;
-    private static int PRIVATE_MESSAGE = 1234;
+    private static int PRIVATE_MESSAGE = 9999;
 
     protected ChatClientImpl(String name, String clientIP, ChatServer chatServer) throws RemoteException {
         super();
@@ -42,16 +42,14 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
     @Override
     public void sendPrivateMessage(String sender, String receiver, String message) throws RemoteException {
-        ChatClient receiverInterface = chatServer.getReceiverInterface(this, receiver);
+        ChatClient receiverInterface = chatServer.getReceiverInterface(receiver);
         String receiverIP = receiverInterface.getIP();
         
         if (receiverIP != null) {
             try {
-                // Aquí debes implementar la lógica para establecer una conexión directa
-                // con receiverIP y enviar el mensaje
                 receiverInterface.iniciarSocket();
-                //System.out.println("Estableciendo conexión directa con " + receiverIP + " y enviando mensaje...");
-                Socket serverSocket = new Socket(receiverIP, 9999);
+
+                Socket serverSocket = new Socket(receiverIP, PRIVATE_MESSAGE);
                 DataOutputStream outputServer = new DataOutputStream(serverSocket.getOutputStream());
                 outputServer.writeUTF(sender + " te ha susurrado: " + message);
                 serverSocket.close();
@@ -87,7 +85,7 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
     public void iniciarSocket() {
         Thread socketThread = new Thread(() -> {
             try {
-                ServerSocket serverSocket = new ServerSocket(9999);
+                ServerSocket serverSocket = new ServerSocket(PRIVATE_MESSAGE);
                 Socket clientSocket;
                 DataOutputStream outputClient;
                 BufferedReader input;
@@ -114,8 +112,8 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
     public static void main(String[] args) {
         try {
-            String name = "fer";
-            String clientIP = "192.168.1.87";
+            String name = "asd";
+            String clientIP = "192.168.1.89";
             String serverIP = "192.168.1.87";
 
             Registry registry = LocateRegistry.getRegistry(serverIP, BROADCAST_MESSAGE);

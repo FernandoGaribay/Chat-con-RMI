@@ -42,19 +42,7 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
     }
 
     @Override
-    public String getReceiverIP(ChatClient sender, String receiver) throws RemoteException {
-        for (ChatClient client : clients) {
-            String clientName = client.getName();
-
-            if (clientName.equals(receiver)) {
-                return client.getIP();
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public ChatClient getReceiverInterface(ChatClient sender, String receiver) throws RemoteException {
+    public ChatClient getReceiverInterface(String receiver) throws RemoteException {
         for (ChatClient client : clients) {
             String clientName = client.getName();
 
@@ -67,13 +55,9 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
 
     public static void main(String[] args) {
         try {
-            // Direccion ip (localhost = InetAddress.getLocalHost().getHostAddress();)
             String ipAddress = "192.168.1.87";
 
-            // Establece la propiedad "java.rmi.server.hostname" para la dirección IP
             System.setProperty("java.rmi.server.hostname", ipAddress);
-
-            // Crea el registro RMI en la dirección IP y el puerto especificados 1099
             Registry registry = LocateRegistry.createRegistry(1234);
 
             ChatServer chatServer = new ChatServerImpl();
