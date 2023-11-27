@@ -28,7 +28,6 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
         this.clientIP = clientIP;
         this.chatServer = chatServer;
         this.chatServer.registerClient(this);
-        iniciarSocket();
     }
 
     @Override
@@ -43,19 +42,20 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
     @Override
     public void sendPrivateMessage(String receiver, String message) throws RemoteException {
-        String receiverIP = chatServer.getReceiverIP(this, receiver);
-
+        ChatClient receiverInterface = chatServer.getReceiverInterface(this, receiver);
+        String receiverIP = receiverInterface.getIP();
+        
         if (receiverIP != null) {
             try {
                 // Aquí debes implementar la lógica para establecer una conexión directa
                 // con receiverIP y enviar el mensaje
-                System.out.println("Estableciendo conexión directa con " + receiverIP + " y enviando mensaje...");
-                
+                receiverInterface.iniciarSocket();
+                //System.out.println("Estableciendo conexión directa con " + receiverIP + " y enviando mensaje...");
                 Socket serverSocket = new Socket(receiverIP, 9999);
                 DataOutputStream outputServer = new DataOutputStream(serverSocket.getOutputStream());
-                outputServer.writeUTF("Mensaje privado " + message + "\n");
+                outputServer.writeUTF(receiverInterface.getName() + " te ha susurrado: " + message);
                 serverSocket.close();
-                
+
             } catch (IOException ex) {
                 Logger.getLogger(ChatClientImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -87,29 +87,23 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
     public void iniciarSocket() {
         Thread socketThread = new Thread(() -> {
             try {
-                ServerSocket serverSocket = new ServerSocket(0);
+                ServerSocket serverSocket = new ServerSocket(9999);
                 Socket clientSocket;
                 DataOutputStream outputClient;
                 BufferedReader input;
                 String message;
 
-                while (true) {
-                    System.out.println("Esperando...");
-                    clientSocket = serverSocket.accept();
-                    System.out.println("Cliente en línea...");
-                    //Se obtiene el flujo de salida del cliente para enviarle mensajes
-                    outputClient = new DataOutputStream(clientSocket.getOutputStream());
-                    //Se le envía un mensaje al cliente usando su flujo de salida
-                    outputClient.writeUTF("Petición recibida y aceptada");
-                    //Se obtiene el flujo entrante desde el cliente
-                    input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    while ((message = input.readLine()) != null) {
-                        System.out.println(message);
-                    }
-                    clientSocket.close();
-                    System.out.println("Fin de la conexión");
+                clientSocket = serverSocket.accept();
+                //Se obtiene el flujo de salida del cliente para enviarle mensajes
+                outputClient = new DataOutputStream(clientSocket.getOutputStream());
+                //Se obtiene el flujo entrante desde el cliente
+                input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                while ((message = input.readLine()) != null) {
+                    System.out.println(message);
                 }
-                //serverSocket.close();
+                clientSocket.close();
+
+                serverSocket.close();
             } catch (IOException ex) {
                 Logger.getLogger(ChatClientImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -121,9 +115,9 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
     public static void main(String[] args) {
         try {
             // Nombre del cliente
-            String name = "ade";
+            String name = "jos";
             // IP del cliente
-            String clientIP = "192.168.1.101";  // Cambia esto con la forma en que obtienes la IP del cliente
+            String clientIP = "192.168.1.89";  // Cambia esto con la forma en que obtienes la IP del cliente
             // IP del servidor
             String serverIP = "192.168.1.87";
             // Registro RMI con la dirección IP y el puerto del servidor

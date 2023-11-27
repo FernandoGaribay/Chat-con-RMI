@@ -53,6 +53,18 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
         return null;
     }
 
+    @Override
+    public ChatClient getReceiverInterface(ChatClient sender, String receiver) throws RemoteException {
+        for (ChatClient client : clients) {
+            String clientName = client.getName();
+
+            if (clientName.equals(receiver)) {
+                return client;
+            }
+        }
+        return null;
+    }
+
     public static void main(String[] args) {
         try {
             // Direccion ip (localhost = InetAddress.getLocalHost().getHostAddress();)
