@@ -24,7 +24,7 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
     @Override
     public void broadcastMessage(ChatClient sender, String message) throws RemoteException {
         for (ChatClient client : clients) {
-            // Excluir al remitente del envío del mensaje
+            // Excluir al remitente del envio del mensaje
             if (!client.toString().equals(sender.toString())) {
                 client.receiveMessage(message);
             }
