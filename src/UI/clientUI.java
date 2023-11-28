@@ -23,13 +23,13 @@ public class clientUI extends javax.swing.JFrame {
 
     public clientUI() {
         initComponents();
-//        this.name = JOptionPane.showInputDialog("Ingrese su nombre:");
-//        this.clientIP = JOptionPane.showInputDialog("Ingrese la dirección IP del cliente:");
-//        this.serverIP = JOptionPane.showInputDialog("Ingrese la dirección del servidor de chat:");
+        this.name = JOptionPane.showInputDialog("Ingrese su nombre:");
+        this.clientIP = JOptionPane.showInputDialog("Ingrese la dirección IP del cliente:");
+        this.serverIP = JOptionPane.showInputDialog("Ingrese la dirección del servidor de chat:");
 
-        this.name = "ale";
-        this.clientIP = "192.168.1.89";
-        this.serverIP = "192.168.1.87";
+//        this.name = "ale";
+//        this.clientIP = "192.168.1.89";
+//        this.serverIP = "192.168.1.87";
 
         try {
             Registry registry = LocateRegistry.getRegistry(serverIP, BROADCAST_MESSAGE);

@@ -14,8 +14,8 @@ public class serverUI extends javax.swing.JFrame {
         try {
             initComponents();
 
-//            serverIP = this.serverIP = JOptionPane.showInputDialog("Ingrese la dirección del servidor de chat:");
-            serverIP = "192.168.1.87";
+            serverIP = this.serverIP = JOptionPane.showInputDialog("Ingrese la dirección del servidor de chat:");
+//            serverIP = "192.168.1.87";
 
             System.setProperty("java.rmi.server.hostname", serverIP);
             Registry registry = LocateRegistry.createRegistry(1234);
