@@ -27,8 +27,8 @@ public class clientUI extends javax.swing.JFrame {
 //        this.clientIP = JOptionPane.showInputDialog("Ingrese la dirección IP del cliente:");
 //        this.serverIP = JOptionPane.showInputDialog("Ingrese la dirección del servidor de chat:");
 
-        this.name = "fer";
-        this.clientIP = "192.168.1.87";
+        this.name = "ale";
+        this.clientIP = "192.168.1.89";
         this.serverIP = "192.168.1.87";
 
         try {
@@ -105,9 +105,11 @@ public class clientUI extends javax.swing.JFrame {
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
         if (!textMessage.getText().isEmpty()) {
             try {
-                pnlChat.add(new reciveMessage(textMessage.getText(), true));
-                pnlChat.repaint();
-                pnlChat.revalidate();
+                if(!textMessage.getText().startsWith("/msg")){
+                    pnlChat.add(new reciveMessage(textMessage.getText(), true));
+                    pnlChat.repaint();
+                    pnlChat.revalidate();
+                }
 
                 if (textMessage.getText().startsWith("/msg")) {
                     // Formato: /private [user] [message]
@@ -115,7 +117,7 @@ public class clientUI extends javax.swing.JFrame {
                     if (parts.length == 3) {
                         objChatClient.sendPrivateMessage(name, parts[1], parts[2]);
                     } else {
-                        System.out.println("Error de comando privado");
+                        JOptionPane.showMessageDialog(null, "Error en la sintaxis de mensaje privado.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
                     objChatClient.sendMessage(textMessage.getText());
