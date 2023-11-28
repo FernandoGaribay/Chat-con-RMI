@@ -13,6 +13,6 @@ public class privateMessageImpl extends UnicastRemoteObject implements privateMe
     @Override
     public void miMetodo1(String sender, String message) throws RemoteException {
         //System.out.println("-> " + sender + " te ha susurrado: " + message);
-        JOptionPane.showMessageDialog(null, message,"Mensaje privado de: " + sender, JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(null, message,"Mensaje privado de: " + sender, JOptionPane.INFORMATION_MESSAGE);
     }
 }

@@ -7,29 +7,36 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implements ChatClient {
 
     private String name;
     private String clientIP;
     private ChatServer chatServer;
-    private JPanel output; 
+    private JPanel output;
+    private JList listUsers;
 
     private static int BROADCAST_MESSAGE = 1234;
     private static int PRIVATE_MESSAGE = 9999;
 
-    public ChatClientImpl(String name, String clientIP, ChatServer chatServer, JPanel output) throws RemoteException {
+    public ChatClientImpl(String name, String clientIP, ChatServer chatServer, JPanel output, JList listUsers) throws RemoteException {
         super();
         this.name = name;
         this.clientIP = clientIP;
         this.chatServer = chatServer;
         this.chatServer.registerClient(this);
         this.output = output;
+        this.listUsers = listUsers;
     }
 
     @Override
@@ -78,7 +85,7 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
     public void exitChat() throws RemoteException {
         chatServer.boardcastExitMessage(this, "-> " + name + " ha salido del chat.");
     }
-    
+
     @Override
     public void iniciarCanalPrivado() {
         Thread socketThread = new Thread(() -> {
@@ -96,6 +103,24 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
         socketThread.start();
     }
+
+    @Override
+    public void updateClientList(List<ChatClient> clients) {
+        SwingUtilities.invokeLater(() -> {
+            DefaultListModel<String> listModel = new DefaultListModel<>();
+
+            for (ChatClient client : clients) {
+                try {
+                    listModel.addElement(client.getName());
+                } catch (RemoteException ex) {
+                    Logger.getLogger(ChatClientImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            listUsers.setModel(listModel);
+        });
+    }
+
 
     /* public static void main(String[] args) {
         try {

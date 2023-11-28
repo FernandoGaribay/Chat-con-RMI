@@ -27,14 +27,14 @@ public class clientUI extends javax.swing.JFrame {
 //        this.clientIP = JOptionPane.showInputDialog("Ingrese la dirección IP del cliente:");
 //        this.serverIP = JOptionPane.showInputDialog("Ingrese la dirección del servidor de chat:");
 
-        this.name = "ale";
-        this.clientIP = "192.168.1.89";
+        this.name = "fer";
+        this.clientIP = "192.168.1.87";
         this.serverIP = "192.168.1.87";
 
         try {
             Registry registry = LocateRegistry.getRegistry(serverIP, BROADCAST_MESSAGE);
             ChatServer chatServer = (ChatServer) registry.lookup("ChatServer");
-            objChatClient = new ChatClientImpl(name, clientIP, chatServer, pnlChat);
+            objChatClient = new ChatClientImpl(name, clientIP, chatServer, pnlChat, listUsers);
         } catch (Exception ex) {
             Logger.getLogger(ChatClientImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -46,7 +46,7 @@ public class clientUI extends javax.swing.JFrame {
 
         background = new javax.swing.JPanel();
         scrollUsuariosConectados = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        listUsers = new javax.swing.JList<>();
         lblUsuariosConectados = new javax.swing.JLabel();
         textMessage = new javax.swing.JTextField();
         btnSend = new javax.swing.JButton();
@@ -61,12 +61,13 @@ public class clientUI extends javax.swing.JFrame {
         background.setBackground(new java.awt.Color(255, 255, 255));
         background.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        listUsers.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        listUsers.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                listUsersValueChanged(evt);
+            }
         });
-        scrollUsuariosConectados.setViewportView(jList1);
+        scrollUsuariosConectados.setViewportView(listUsers);
 
         background.add(scrollUsuariosConectados, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 50, 183, 530));
 
@@ -132,6 +133,21 @@ public class clientUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnSendActionPerformed
 
+    private void listUsersValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listUsersValueChanged
+        if (!evt.getValueIsAdjusting()) {
+            int selectedIndex = listUsers.getSelectedIndex();
+            String selectedName = listUsers.getModel().getElementAt(selectedIndex);
+            if (selectedIndex != -1 && !selectedName.equals(objChatClient.getName())) {
+                System.out.println(selectedName);
+                System.out.println(objChatClient.getName());
+                textMessage.setText("/msg " + selectedName + " ");
+                textMessage.requestFocus();
+            } else {
+                JOptionPane.showMessageDialog(null, "No puedes mandarte un mensaje privado a ti mismo.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_listUsersValueChanged
+
     public static void main(String args[]) {
         // <editor-fold defaultstate="collapsed" desc="Generated Code"> 
         try {
@@ -162,8 +178,8 @@ public class clientUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel background;
     private javax.swing.JButton btnSend;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JLabel lblUsuariosConectados;
+    private javax.swing.JList<String> listUsers;
     private javax.swing.JPanel pnlChat;
     private javax.swing.JScrollPane scrollChat;
     private javax.swing.JScrollPane scrollUsuariosConectados;
