@@ -4,8 +4,11 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -36,25 +39,20 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
     }
 
     @Override
-    public void receivePrivateMessage(String sender, String message) throws RemoteException {
-        System.out.println("Mensaje privado de " + sender + ": " + message);
-    }
-
-    @Override
     public void sendPrivateMessage(String sender, String receiver, String message) throws RemoteException {
         ChatClient receiverInterface = chatServer.getReceiverInterface(receiver);
         String receiverIP = receiverInterface.getIP();
-        
+
         if (receiverIP != null) {
             try {
-                receiverInterface.iniciarSocket();
 
-                Socket serverSocket = new Socket(receiverIP, PRIVATE_MESSAGE);
-                DataOutputStream outputServer = new DataOutputStream(serverSocket.getOutputStream());
-                outputServer.writeUTF(sender + " te ha susurrado: " + message);
-                serverSocket.close();
+                receiverInterface.iniciarCanalPrivado();
+                privateMessage mir = (privateMessage) Naming.lookup("//" + receiverIP + ":" + PRIVATE_MESSAGE + "/privateMSG");
+                mir.miMetodo1(sender, message);
 
             } catch (IOException ex) {
+                Logger.getLogger(ChatClientImpl.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NotBoundException ex) {
                 Logger.getLogger(ChatClientImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
 
@@ -82,24 +80,16 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
     }
 
     @Override
-    public void iniciarSocket() {
+    public void iniciarCanalPrivado() {
         Thread socketThread = new Thread(() -> {
             try {
-                ServerSocket serverSocket = new ServerSocket(PRIVATE_MESSAGE);
-                Socket clientSocket;
-                DataOutputStream outputClient;
-                BufferedReader input;
-                String message;
-
-                clientSocket = serverSocket.accept(); // Acepta  al cliente
-                outputClient = new DataOutputStream(clientSocket.getOutputStream());
-                input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                while ((message = input.readLine()) != null) {
-                    System.out.println(message);
-                }
-                clientSocket.close();
-                serverSocket.close();
-            } catch (IOException ex) {
+                privateMessage privateMessageObj = new privateMessageImpl();
+                Registry registry = LocateRegistry.createRegistry(PRIVATE_MESSAGE);
+                java.rmi.Naming.rebind("//"
+                        + clientIP
+                        + ":" + PRIVATE_MESSAGE + "/privateMSG", privateMessageObj);
+                //System.out.println("servicio privado rmi iniciado");
+            } catch (Exception ex) {
                 Logger.getLogger(ChatClientImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
@@ -109,8 +99,8 @@ public class ChatClientImpl extends java.rmi.server.UnicastRemoteObject implemen
 
     public static void main(String[] args) {
         try {
-            String name = "ale";
-            String clientIP = "192.168.1.89";
+            String name = "fer";
+            String clientIP = "192.168.1.87";
             String serverIP = "192.168.1.87";
 
             Registry registry = LocateRegistry.getRegistry(serverIP, BROADCAST_MESSAGE);
